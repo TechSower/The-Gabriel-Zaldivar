@@ -213,6 +213,11 @@ a, a:hover {
   position: relative;
 }
 
+.heading gsap-reveal-hero{
+  padding: 2px;
+  margin: 0;
+}
+
 .unslate_co--site-nav .site-nav-ul > li > a:before, .unslate_co--site-nav .site-nav-ul-none-onepage > li > a:before {
   left: 7px;
   right: 7px;
