@@ -11,19 +11,21 @@ function url(){
   );
 }
 
-if($_POST) {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-   $name = trim(stripslashes($_POST['name']));
-   $email = trim(stripslashes($_POST['email']));
-   $subject = trim(stripslashes($_POST['subject']));
-   $contact_message = trim(stripslashes($_POST['message']));
+   $name = filter_input(INPUT_POST, 'name', FILTER_SANITIZE_STRING);
+   $email = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+   $subject = filter_input(INPUT_POST, 'subject', FILTER_SANITIZE_STRING);
+   $contact_message = filter_input(INPUT_POST, 'message', FILTER_SANITIZE_STRING);
 
-   
-	if ($subject == '') { $subject = "Contact Form Submission"; }
+   if ($subject == '') { $subject = "Contact Form Submission"; }
+
+   // Initialize $message
+   $message = "";
 
    // Set Message
    $message .= "Email from: " . $name . "<br />";
-	 $message .= "Email address: " . $email . "<br />";
+   $message .= "Email address: " . $email . "<br />";
    $message .= "Message: <br />";
    $message .= nl2br($contact_message);
    $message .= "<br /> ----- <br /> This email was sent from your site " . url() . " contact form. <br />";
@@ -32,17 +34,20 @@ if($_POST) {
    $from =  $name . " <" . $email . ">";
 
    // Email Headers
-	$headers = "From: " . $from . "\r\n";
-	$headers .= "Reply-To: ". $email . "\r\n";
- 	$headers .= "MIME-Version: 1.0\r\n";
-	$headers .= "Content-Type: text/html; charset=ISO-8859-1\r\n";
+   $subject_encoded = mb_encode_mimeheader($subject, 'UTF-8');
+   $headers = "From: " . $from . "\r\n";
+   $headers .= "Reply-To: ". $email . "\r\n";
+   $headers .= "MIME-Version: 1.0\r\n";
+   $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
 
-   ini_set("sendmail_from", $to); // for windows server
-   $mail = mail($to, $subject, $message, $headers);
+   // Attempt to send email
+   $mail = mail($to, $subject_encoded, $message, $headers);
 
-	if ($mail) { echo "OK"; }
-   else { echo "Something went wrong. Please try again."; }
-
+   if ($mail) { 
+      echo "OK"; 
+   } else { 
+      echo "Something went wrong. Please try again."; 
+   }
 }
 
 ?>
